@@ -1,3 +1,11 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
 .terraform/
-terraform.*
-.terraform*
+.terraform.lock.hcl
+
+# Ignore provider plugins
+.terraform/providers/
+
+# AWS specific large files
+terraform-provider-aws*
