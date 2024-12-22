@@ -1,0 +1,17 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Ignore provider plugins
+.terraform/providers/
+
+# AWS specific large files
+terraform-provider-aws*
+# Exclude all .tfvars files
+*.tfvars
+
+# Exclude any .pem or .key files
+*.pem
+*.key
