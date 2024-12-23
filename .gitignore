@@ -15,3 +15,4 @@ terraform-provider-aws*
 # Exclude any .pem or .key files
 *.pem
 *.key
+.env

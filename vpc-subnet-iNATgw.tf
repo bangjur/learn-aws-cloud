@@ -2,31 +2,31 @@
 # Grouping existing subnets into public or private subnet
 
 resource "aws_route_table" "public" {
-  vpc_id = "vpc-0c8eb8a879bd78356"
+  vpc_id = "vpc-08713b127e52a88a7"
 }
 
 resource "aws_route_table_association" "public_association" {
-  subnet_id      = "subnet-0f1800c6e1bd0fb84"
+  subnet_id      = "subnet-07e04cdf75d50469b"
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route" "public_route" {
   route_table_id         = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "igw-00a7767c101d3df30"
+  gateway_id             = "igw-0e880c71b3ddf5d02"
 }
 
 resource "aws_route_table" "private" {
-  vpc_id = "vpc-0c8eb8a879bd78356"
+  vpc_id = "vpc-08713b127e52a88a7"
 }
 
 resource "aws_route_table_association" "private_association" {
-  subnet_id      = "subnet-05b480e06b36dd1fc"
+  subnet_id      = "subnet-0f608aef51cc73a45"
   route_table_id = aws_route_table.private.id
 }
 
 resource "aws_security_group_rule" "allow_traffic" {
-  security_group_id = "sg-035ce2a048a80bf17"
+  security_group_id = "sg-03c7dfa36ab3dafca"
 
   # Allow SSH
   type        = "ingress"
@@ -37,7 +37,7 @@ resource "aws_security_group_rule" "allow_traffic" {
 }
 
 resource "aws_security_group_rule" "allow_smtp" {
-  security_group_id = "sg-035ce2a048a80bf17"
+  security_group_id = "sg-03c7dfa36ab3dafca"
 
   # Allow SMTP
   type        = "ingress"
@@ -48,7 +48,7 @@ resource "aws_security_group_rule" "allow_smtp" {
 }
 
 resource "aws_security_group_rule" "allow_http" {
-  security_group_id = "sg-035ce2a048a80bf17"
+  security_group_id = "sg-03c7dfa36ab3dafca"
 
   # Allow HTTP
   type        = "ingress"
@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "allow_http" {
 }
 
 resource "aws_security_group_rule" "allow_https" {
-  security_group_id = "sg-035ce2a048a80bf17"
+  security_group_id = "sg-03c7dfa36ab3dafca"
 
   # Allow HTTPS
   type        = "ingress"
@@ -70,7 +70,7 @@ resource "aws_security_group_rule" "allow_https" {
 }
 
 resource "aws_security_group_rule" "allow_icmp" {
-  security_group_id = "sg-035ce2a048a80bf17"
+  security_group_id = "sg-03c7dfa36ab3dafca"
 
   # Allow ICMP (ping)
   type        = "ingress"
@@ -88,7 +88,7 @@ resource "aws_eip" "nat_eip" {
 # Create NAT Gateway in the public subnet
 resource "aws_nat_gateway" "default_natgw" {
   allocation_id = aws_eip.nat_eip.id
-  subnet_id     = "subnet-0f1800c6e1bd0fb84"  # Public subnet
+  subnet_id     = "subnet-07e04cdf75d50469b"  # Public subnet
   tags = {
     Name = "default-natgw"
   }
