@@ -1,3 +1,5 @@
+# Create two EC2 instances, each on private and public subnet.
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -5,8 +7,8 @@ provider "aws" {
 resource "aws_instance" "webapp_server1" {
   ami           = "ami-0e2c8caa4b6378d8c"  # Ubuntu 24.04 AMI
   instance_type = "t2.medium"
-  subnet_id     = "subnet-0821ba00a02445cd4"  # Public subnet
-  security_groups = ["sg-0677d504f0e8016e5"]  # Existing security group
+  subnet_id     = "subnet-0f1800c6e1bd0fb84"  # Public subnet
+  security_groups = ["sg-035ce2a048a80bf17"]  # Existing security group
   
   # Instance storage (EBS volume of 20GB)
   root_block_device {
@@ -25,8 +27,8 @@ resource "aws_instance" "webapp_server1" {
 resource "aws_instance" "db_server1" {
   ami           = "ami-0e2c8caa4b6378d8c"  # Ubuntu 24.04 AMI
   instance_type = "t2.medium"
-  subnet_id     = "subnet-0b98b58a183f3061a"  # Private subnet
-  security_groups = ["sg-0677d504f0e8016e5"]  # Existing security group
+  subnet_id     = "subnet-05b480e06b36dd1fc"  # Private subnet
+  security_groups = ["sg-035ce2a048a80bf17"]  # Existing security group
 
   # Instance storage (EBS volume of 20GB)
   root_block_device {
