@@ -5,6 +5,13 @@ resource "aws_s3_bucket" "baru_backup_bucket" {
     Name        = "webapp-bucket1"
     Environment = "Production"
   }
+
+  # Allows deletion of non-empty bucket
+  force_destroy = true 
+
+  # Avoid error S3:GetObjectLockConfig because lack of IAM roles
+  object_lock_enabled = false 
+
 }
 
 resource "aws_s3_bucket_versioning" "backup_bucket_versioning" {

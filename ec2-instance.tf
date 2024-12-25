@@ -5,10 +5,10 @@ provider "aws" {
 }
 
 resource "aws_instance" "webapp_server1" {
-  ami           = "ami-0e2c8caa4b6378d8c"  # Ubuntu 24.04 AMI
+  ami           = var.instance_ami # Ubuntu 24.04 AMI
   instance_type = "t2.medium"
-  subnet_id     = "subnet-07e04cdf75d50469b"  # Public subnet
-  security_groups = ["sg-03c7dfa36ab3dafca"]  # Existing security group
+  subnet_id     = var.public_subnet_id  # Public subnet
+  security_groups = [var.security_group_id]  # Existing security group
   
   user_data = file("setup-script.sh")
 
@@ -27,10 +27,10 @@ resource "aws_instance" "webapp_server1" {
 }
 
 resource "aws_instance" "db_server1" {
-  ami           = "ami-0e2c8caa4b6378d8c"  # Ubuntu 24.04 AMI
+  ami           = var.instance_ami  # Ubuntu 24.04 AMI
   instance_type = "t2.medium"
-  subnet_id     = "subnet-0f608aef51cc73a45"  # Private subnet
-  security_groups = ["sg-03c7dfa36ab3dafca"]  # Existing security group
+  subnet_id     = var.private_subnet_id  # Private subnet
+  security_groups = [var.security_group_id]  # Existing security group
 
   user_data = file("setup-script.sh")
 
