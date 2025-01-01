@@ -1,0 +1,22 @@
+---
+- name: Configure web server and database
+  hosts: all
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install necessary packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - net-tools
+        - ufw
+
+    - name: Configure UFW
+      command: "ufw allow {{ item }}"
+      loop:
+        - 22
+        - 80
+        - 443

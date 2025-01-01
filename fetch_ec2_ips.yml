@@ -1,0 +1,27 @@
+# fetch_ec2_ips.yml
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Fetch EC2 instance info
+      amazon.aws.ec2_instance_info:
+        region: us-east-1
+      register: ec2_info
+
+    - name: Create inventory file
+      copy:
+        content: |
+          [webservers]
+          {% for instance in ec2_info.instances %}
+          {% if instance.tags.Name == 'webapp-server1' %}
+          {{ instance.public_ip_address }} ansible_user=ubuntu
+          {% endif %}
+          {% endfor %}
+
+          [dbservers]
+          {% for instance in ec2_info.instances %}
+          {% if instance.tags.Name == 'db-server1' %}
+          {{ instance.private_ip_address }} ansible_user=ubuntu ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q ubuntu@{{ ec2_info.instances | selectattr("tags.Name", "equalto", "BastionHost") | map(attribute="public_ip_address") | first }}"'
+          {% endif %}
+          {% endfor %}
+        dest: ip-targets.ini

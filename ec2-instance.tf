@@ -19,7 +19,7 @@ resource "aws_instance" "webapp_server1" {
   }
 
   # IAM Role (No key pair, using IAM role for instance profile)
-  iam_instance_profile = "LabInstanceProfile"  # Or use "LabInstanceRole" if preferred
+  iam_instance_profile = var.iam_instance_profile  # Or use "LabInstanceRole" if preferred
 
   tags = {
     Name = "webapp-server1"
@@ -41,9 +41,22 @@ resource "aws_instance" "db_server1" {
   }
 
   # IAM Role (No key pair, using IAM role for instance profile)
-  iam_instance_profile = "LabInstanceProfile"  # Or use "LabInstanceRole" if preferred
+  iam_instance_profile = var.iam_instance_profile  # Or use "LabInstanceRole" if preferred
 
   tags = {
     Name = "db-server1"
+  }
+}
+
+resource "aws_instance" "bastion_host" {
+  ami           = "ami-0e2c8caa4b6378d8c"  # Ubuntu 24.04 AMI
+  instance_type = "t2.micro"               # Small instance for bastion
+  subnet_id     = var.public_subnet_id     # Place in the public subnet
+  security_groups = [var.security_group_id] # Use an existing security group
+
+  user_data = file("setup-script.sh")
+  
+  tags = {
+    Name = "BastionHost"
   }
 }

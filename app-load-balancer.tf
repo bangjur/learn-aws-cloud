@@ -2,7 +2,7 @@
 resource "aws_security_group" "web_sg" {
   name        = "webapp-sg"
   description = "Security group for web app EC2 instance"
-  vpc_id      = "vpc-0d871e37d05d4ced6"
+  vpc_id      = var.vpc_id
   
   ingress {
     from_port   = 80
@@ -31,7 +31,7 @@ resource "aws_lb" "app_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.web_sg.id]
-  subnets            = ["subnet-0825bee723687e40c", "subnet-0e771d828167cfe99"]
+  subnets            = [var.public_subnet_id, var.private_subnet_id]
   
   enable_deletion_protection = false
 }
@@ -40,7 +40,7 @@ resource "aws_lb_target_group" "app_target_group" {
   name     = "webapp-target-group"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "vpc-0d871e37d05d4ced6"
+  vpc_id   = var.vpc_id
 
   health_check {
     path     = "/"
@@ -80,8 +80,4 @@ resource "aws_lb_listener_rule" "api_listener" {
       values = ["/api/*"]
     }
   }
-}
-
-output "alb_dns_name" {
-  value = aws_lb.app_lb.dns_name
 }

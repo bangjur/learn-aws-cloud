@@ -31,7 +31,7 @@ variable "volume_type" {
 variable "iam_instance_profile" {
   description = "IAM instance profile name"
   type        = string
-  default     = "LabInstanceProfile"
+  default     = "myS3Role"
 }
 
 variable "instance_tags" {
