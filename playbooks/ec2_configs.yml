@@ -1,6 +1,7 @@
 ---
 - name: Configure web server and database
   hosts: all
+  become: yes  # Ensures tasks are run with elevated privileges
   tasks:
     - name: Update apt cache
       apt:
@@ -14,9 +15,3 @@
         - net-tools
         - ufw
 
-    - name: Configure UFW
-      command: "ufw allow {{ item }}"
-      loop:
-        - 22
-        - 80
-        - 443

@@ -18,3 +18,4 @@ terraform-provider-aws*
 .env
 venv/
 *.ini
+setup-ec2.sh

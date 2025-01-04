@@ -10,7 +10,7 @@ resource "aws_instance" "webapp_server1" {
   subnet_id     = var.public_subnet_id  # Public subnet
   security_groups = [var.security_group_id]  # Existing security group
   
-  user_data = file("setup-script.sh")
+  user_data = file("setup-ec2.sh")
 
   # Instance storage (EBS volume of 20GB)
   root_block_device {
@@ -32,7 +32,7 @@ resource "aws_instance" "db_server1" {
   subnet_id     = var.private_subnet_id  # Private subnet
   security_groups = [var.security_group_id]  # Existing security group
 
-  user_data = file("setup-script.sh")
+  user_data = file("setup-ec2.sh")
 
   # Instance storage (EBS volume of 20GB)
   root_block_device {
@@ -54,7 +54,7 @@ resource "aws_instance" "bastion_host" {
   subnet_id     = var.public_subnet_id     # Place in the public subnet
   security_groups = [var.security_group_id] # Use an existing security group
 
-  user_data = file("setup-script.sh")
+  user_data = file("setup-ec2.sh")
   
   tags = {
     Name = "BastionHost"
