@@ -25,5 +25,5 @@
 
           [dbservers]
           {% for instance in ec2_info.instances if instance.tags.Name == 'db-server1' %}
-          {{ instance.private_ip_address }} ansible_user=ubuntu ansible_ssh_common_args='-o ProxyCommand="ssh -i path/to/private/key -W %h:%p -q ubuntu@{{ (ec2_info.instances | selectattr('tags.Name', 'equalto', 'BastionHost') | map(attribute='public_ip_address') | list)[0] }}"'
+          {{ instance.private_ip_address }} ansible_user=ubuntu ansible_ssh_common_args='-o ProxyCommand="ssh -i ~/.ssh/ed25519_ubuntu-instance -W %h:%p -q ubuntu@{{ (ec2_info.instances | selectattr('tags.Name', 'equalto', 'BastionHost') | map(attribute='public_ip_address') | list)[0] }}"'
           {% endfor %}

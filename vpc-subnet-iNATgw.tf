@@ -80,15 +80,15 @@ resource "aws_security_group_rule" "allow_icmp" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "allow_3000" {
-  security_group_id = var.security_group_id
+resource "aws_security_group" "allow_alb_sg" {
+  vpc_id = var.vpc_id
 
-  # Allow ICMP (ping)
-  type        = "ingress"
-  from_port   = 3000
-  to_port     = 3000
-  protocol    = "icmp"
-  cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]  # Allow traffic from ALB
+  }
 }
 
 # Create Elastic IP for the NAT Gateway

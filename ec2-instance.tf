@@ -8,7 +8,7 @@ resource "aws_instance" "webapp_server1" {
   ami           = var.instance_ami # Ubuntu 24.04 AMI
   instance_type = "t2.medium"
   subnet_id     = var.public_subnet_id  # Public subnet
-  security_groups = [var.security_group_id]  # Existing security group
+  security_groups = [var.security_group_id, aws_security_group.allow_alb_sg.id]  # Existing security group
   
   user_data = file("setup-ec2.sh")
 

@@ -1,5 +1,5 @@
 
-resource "aws_security_group" "web_sg" {
+resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Security group for web app EC2 instance"
   vpc_id      = var.vpc_id
@@ -30,7 +30,7 @@ resource "aws_lb" "app_lb" {
   name               = "webapp-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.web_sg.id]
+  security_groups    = [aws_security_group.alb_sg.id]
   subnets            = [var.public_subnet_id, var.private_subnet_id]
   
   enable_deletion_protection = false
@@ -43,9 +43,12 @@ resource "aws_lb_target_group" "app_target_group" {
   vpc_id   = var.vpc_id
 
   health_check {
-    path     = "/"
-    interval = 30
-    timeout  = 5
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
   }
 }
 
@@ -87,3 +90,5 @@ resource "aws_lb_target_group_attachment" "app_target_attachment" {
   target_id        = aws_instance.webapp_server1.id  # ID dari EC2 instance Anda
   port             = 80  
 }
+
+

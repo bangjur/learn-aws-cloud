@@ -121,7 +121,7 @@
           MONGODB_VERSION=6.0
           MONGODB_PORT_NUMBER=27017
           MONGODB_REPLICA_SET_NAME=rs0
-          MONGODB_ADVERTISED_HOSTNAME={{ ansible_facts['default_ipv4']['address'] if 'dbservers' in group_names else 'localhost' }}
+          MONGODB_ADVERTISED_HOSTNAME={{ hostvars[groups['dbservers'][0]]['ansible_facts']['default_ipv4']['address'] if groups['dbservers'] else 'localhost' }}
           MONGODB_ENABLE_JOURNAL=true
           ALLOW_EMPTY_PASSWORD=no
           MONGODB_ROOT_USER={{ root_user }}
