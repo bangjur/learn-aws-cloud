@@ -80,6 +80,17 @@ resource "aws_security_group_rule" "allow_icmp" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "allow_3000" {
+  security_group_id = var.security_group_id
+
+  # Allow ICMP (ping)
+  type        = "ingress"
+  from_port   = 3000
+  to_port     = 3000
+  protocol    = "icmp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
 # Create Elastic IP for the NAT Gateway
 resource "aws_eip" "nat_eip" {
   domain = "vpc"  # Replacing the deprecated 'vpc = true' with 'domain = "vpc"'

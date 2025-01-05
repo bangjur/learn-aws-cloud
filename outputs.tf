@@ -9,7 +9,7 @@ output "alb_dns_name" {
 
 output "ec2_ip_list" {
   value = {
-    public_ips  = [aws_instance.webapp_server1.public_ip]
-    private_ips = [aws_instance.db_server1.private_ip]
+    webserver_pub_ips  = [aws_instance.webapp_server1.public_ip]
+    dbserver_priv_ips = [aws_instance.db_server1.private_ip]
   }
 }

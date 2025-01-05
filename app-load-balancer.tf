@@ -1,6 +1,6 @@
 
 resource "aws_security_group" "web_sg" {
-  name        = "webapp-sg"
+  name        = "alb-sg"
   description = "Security group for web app EC2 instance"
   vpc_id      = var.vpc_id
   
@@ -80,4 +80,10 @@ resource "aws_lb_listener_rule" "api_listener" {
       values = ["/api/*"]
     }
   }
+}
+
+resource "aws_lb_target_group_attachment" "app_target_attachment" {
+  target_group_arn = aws_lb_target_group.app_target_group.arn
+  target_id        = aws_instance.webapp_server1.id  # ID dari EC2 instance Anda
+  port             = 80  
 }

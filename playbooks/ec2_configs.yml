@@ -1,17 +1,148 @@
 ---
-- name: Configure web server and database
+- name: Configure webserver and dbserver
   hosts: all
   become: yes  # Ensures tasks are run with elevated privileges
+  vars:
+    creds_file: "./creds.ini"  # Path to your local creds.ini file
+    root_user: "{{ lookup('ini', 'root_user section=credentials file=' + creds_file) }}"
+    root_password: "{{ lookup('ini', 'root_password section=credentials file=' + creds_file) }}"
+    db_username: "{{ lookup('ini', 'db_username section=credentials file=' + creds_file) }}"
+    db_password: "{{ lookup('ini', 'db_password section=credentials file=' + creds_file) }}"
+    mongodb_database: "{{ lookup('ini', 'mongodb_database section=credentials file=' + creds_file) }}"
+    mongodb_replica_set_key: "{{ lookup('password', '/dev/null length=48 chars=ascii_letters') }}"
   tasks:
     - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Install necessary packages
+    - name: Install required packages
       apt:
-        name: "{{ item }}"
+        name: 
+          - docker.io
+          - openssl
+          - docker-compose
         state: present
+
+    - name: Ensure required services are started
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
       loop:
-        - net-tools
-        - ufw
+        - docker
+
+    - name: Copy Docker Compose files to both webserver and dbserver
+      copy:
+        src: "{{ item }}"
+        dest: "/home/ubuntu/{{ item }}"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+      loop:
+        - new-nginx-rc.yml
+        - new-mongodb.yml
+
+    - name: Create nginx folder structure and copy certs
+      file:
+        path: "/home/ubuntu/nginx/certs"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Generate .crt and .key files in nginx folder (webservers only)
+      command: >
+        openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes
+        -keyout /home/ubuntu/nginx/certs/server.key
+        -out /home/ubuntu/nginx/certs/server.crt
+        -subj "/CN=localhost"
+      when: "'webservers' in group_names"
+
+    - name: Set permissions for .crt and .key files
+      file:
+        path: "/home/ubuntu/nginx/certs/{{ item }}"
+        owner: root
+        group: root
+        mode: "{{ '0644' if item.endswith('.crt') else '0600' }}"
+      loop:
+        - server.crt
+        - server.key
+      when: "'webservers' in group_names"
+
+    - name: Create Nginx default.conf
+      copy:
+        dest: "/home/ubuntu/nginx/default.conf"
+        content: |
+          server {
+              listen 80;
+              server_name localhost;
+
+              # Redirect HTTP to HTTPS
+              location / {
+                  return 301 https://$host$request_uri;
+              }
+
+              location /stub_status {
+                  stub_status on;
+                  allow 127.0.0.1;
+                  deny all;
+                  access_log off;
+              }
+          }
+
+          server {
+              listen 443 ssl;
+              server_name localhost;
+
+              ssl_certificate /etc/nginx/certs/server.crt;
+              ssl_certificate_key /etc/nginx/certs/server.key;
+
+              location / {
+                  proxy_pass http://rocketchat:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_buffering off;
+              }
+          }
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+      when: "'webservers' in group_names"
+
+    - name: Create .env file on all servers
+      copy:
+        dest: "/home/ubuntu/.env"
+        content: |
+          MONGODB_VERSION=6.0
+          MONGODB_PORT_NUMBER=27017
+          MONGODB_REPLICA_SET_NAME=rs0
+          MONGODB_ADVERTISED_HOSTNAME={{ ansible_facts['default_ipv4']['address'] if 'dbservers' in group_names else 'localhost' }}
+          MONGODB_ENABLE_JOURNAL=true
+          ALLOW_EMPTY_PASSWORD=no
+          MONGODB_ROOT_USER={{ root_user }}
+          MONGODB_ROOT_PASSWORD={{ root_password }}
+          MONGODB_REPLICA_SET_KEY={{ mongodb_replica_set_key }}
+          MONGODB_DATABASE={{ mongodb_database }}
+          MONGODB_USERNAME={{ db_username }}
+          MONGODB_PASSWORD={{ db_password }}
+          ROOT_URL=https://localhost
+          PORT=3000
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
+
+    - name: Run Docker Compose on dbserver
+      command: docker-compose -f /home/ubuntu/new-mongodb.yml up -d
+      # when: inventory_hostname in group_names and "'dbservers' in group_names"
+      when: "'dbservers' in group_names"
+
+    - name: Run Docker Compose on webserver
+      command: docker-compose -f /home/ubuntu/new-nginx-rc.yml up -d
+      # when: inventory_hostname in group_names and "'webservers' in group_names"
+      when: "'webservers' in group_names"
 

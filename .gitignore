@@ -19,3 +19,4 @@ terraform-provider-aws*
 venv/
 *.ini
 setup-ec2.sh
+*.txt
