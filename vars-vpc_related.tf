@@ -2,31 +2,31 @@
 variable "vpc_id" {
   description = "ID of the existing VPC"
   type        = string
-  default     = "vpc-03e79d426d8c21f1b"
+  default     = "vpc-01a3d767b45a408be"
 }
 
 variable "public_subnet_id" {
   description = "ID of the existing public subnet"
   type        = string
-  default     = "subnet-08af9ef9d8a46bf34"
+  default     = "subnet-07c3e9ff2c73d391a"
 }
 
 variable "private_subnet_id" {
   description = "ID of the existing private subnet"
   type        = string
-  default     = "subnet-0ba24282bbd1b13d7"
+  default     = "subnet-05099c95be390a5d6"
 }
 
 variable "internet_gateway_id" {
   description = "ID of the existing Internet Gateway"
   type        = string
-  default     = "igw-0c81faa0e03e7469d"
+  default     = "igw-0a5c1ab8505818b18"
 }
 
 variable "security_group_id" {
   description = "ID of the existing security group"
   type        = string
-  default     = "sg-00cf28b156e2dddda"
+  default     = "sg-0038d33ed87240d43"
 }
 
 variable "allowed_cidr_blocks" {

@@ -1,4 +1,10 @@
-
+/*
+i didnt use ALB because the limitation of making it listening to https. my account
+doesnt have permission to do that. because it requires valid ssl certificate from CA.
+even though i make my rocketchat app running on https on server side (using nginx and 
+self-signed certificate), the ALB DNS name cannot proceed it (you cannot access the app
+on browser via http://<ALB DNS name>)
+*/
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Security group for web app EC2 instance"
@@ -43,11 +49,14 @@ resource "aws_lb_target_group" "app_target_group" {
   vpc_id   = var.vpc_id
 
   health_check {
-    path                = "/"
+    path                = "/health"
+/*
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
+*/
+    protocol            = "HTTP"  
     matcher             = "200"
   }
 }
@@ -63,6 +72,7 @@ resource "aws_lb_listener" "http_listener" {
   }
 }
 
+/*
 resource "aws_lb_listener_rule" "api_listener" {
   listener_arn = aws_lb_listener.http_listener.arn
   priority     = 1
@@ -81,6 +91,24 @@ resource "aws_lb_listener_rule" "api_listener" {
   condition {
     path_pattern {
       values = ["/api/*"]
+    }
+  }
+}
+*/
+
+resource "aws_lb_listener_rule" "api_listener" {
+  listener_arn = aws_lb_listener.http_listener.arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app_target_group.arn
+  }
+
+  # Remove specific conditions to allow all traffic
+  condition {
+    path_pattern {
+      values = ["/*"]
     }
   }
 }

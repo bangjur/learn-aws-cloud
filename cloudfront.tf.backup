@@ -1,3 +1,9 @@
+/*
+at the end I didnt use cloudfront because the limit from my account credit.
+also for the rocketchat app, i think it's not suitable for using cloudfront, instead
+i prefer to use aws elasticache, but my aws lab account doesnt have permission to use that.
+*/
+
 resource "aws_cloudfront_distribution" "webapp_cf" {
   enabled = true
   
